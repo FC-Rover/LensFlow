@@ -1,0 +1,146 @@
+name: ramin-image-stream
+summary: An applet to stream pi camera over http.
+description: |
+  An applet to stream pi camera over http.
+version: git
+base: core22
+confinement: strict
+architectures:
+  - arm64
+
+
+apps:
+  ramin-image-stream:
+    command: bin/flask-wrapper
+    daemon: simple
+    restart-condition: on-failure
+    plugs:
+      - network
+      - network-bind
+      - camera
+      - media-control
+      - hardware-observe
+      - opengl
+    environment:
+      FLASK_APP: ./server.py
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+
+
+parts:
+  python-packages:
+    plugin: python
+    source: .
+    python-requirements:
+      - requirements.txt
+    build-packages:
+      - libcap-dev
+    after:
+      - libcamera
+      - pykms
+    stage-packages:
+      - libgl1
+      - libice6
+      - libsm6
+      - libx11-6
+      - libxext6
+      - libxcb1
+      - libatlas-base-dev
+      - ffmpeg
+      - libopenjp2-7
+
+  flask-server:
+    plugin: dump
+    source: .
+    organize:
+      server.py: bin/
+      flask-wrapper: bin/
+
+  libcamera:
+    plugin: meson
+    source: https://github.com/dehghanramin/libcamera.git
+    meson-parameters:
+      - --prefix=/snap/ramin-image-stream/current/usr
+      - --buildtype=release
+      - -Dpipelines=rpi/vc4,rpi/pisp
+      - -Dipas=rpi/vc4,rpi/pisp
+      - -Dv4l2=true
+      - -Dgstreamer=enabled
+      - -Dtest=false
+      - -Dlc-compliance=disabled
+      - -Dcam=disabled
+      - -Dqcam=disabled
+      - -Ddocumentation=disabled
+      - -Dpycamera=enabled
+    organize:
+      snap/ramin-image-stream/current/usr: usr
+      snap/ramin-image-stream/current/lib: lib
+    build-packages:
+      - build-essential
+      - meson
+      - ninja-build
+      - pkg-config
+      - pybind11-dev
+      - python3-pybind11
+      - cmake
+      - libgtest-dev
+      - libyaml-dev
+      - python3-yaml
+      - python3-ply
+      - python3-jinja2
+      - libgnutls28-dev
+      - libssl-dev
+      - openssl
+      - libdw-dev
+      - libunwind-dev
+      - libudev-dev
+      - python3-sphinx
+      - graphviz
+      - texlive-latex-extra
+      - libgstreamer1.0-dev
+      - libgstreamer-plugins-base1.0-dev
+      - libdrm-dev
+      - libjpeg-dev
+      - libsdl2-dev
+      - qtbase5-dev
+      - libqt5core5a
+      - libqt5gui5
+      - libqt5widgets5
+      - qttools5-dev-tools
+      - libtiff-dev
+      - liblttng-ust-dev
+      - lttng-tools
+      - libexif-dev
+      - libevent-dev
+      - abi-compliance-checker
+      - libboost-all-dev
+    stage-packages:
+      - liblttng-ust1
+      - libdw1
+      - libssl3
+      - libunwind8
+      - libudev1
+      - libgstreamer1.0-0
+      - libgstreamer-plugins-base1.0-0
+      - libdrm2
+      - libjpeg8
+      - libsdl2-2.0-0
+      - libevent-2.1-7
+      - libexif12
+      - libtiff5
+      - libboost-log1.74.0
+
+  pykms:
+    plugin: meson
+    source: https://github.com/dehghanramin/kmsxx.git
+    meson-parameters:
+      - --prefix=/snap/ramin-image-stream/current/usr
+    organize:
+      snap/ramin-image-stream/current/usr: usr
+      snap/ramin-image-stream/current/lib: lib
+    build-packages:
+      - libdrm-dev
+      - libdrm2
+      - libfmt-dev
+    stage-packages:
+      - libfmt8
