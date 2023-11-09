@@ -1,18 +1,20 @@
-import socket
-import time
-
+import atexit
 from picamera2 import Picamera2
 from picamera2.encoders import H264Encoder
-from picamera2.outputs import FileOutput
+from picamera2.outputs import FfmpegOutput
 
-picam2 = Picamera2()
-video_config = picam2.create_video_configuration({"size": (1280, 720)})
-picam2.configure(video_config)
+
+def exit_handler():
+    cam.stop_recording()
+    cam.close()
+
+
+cam = Picamera2()
+video_config = cam.create_video_configuration({"size": (1280, 720)})
+cam.configure(video_config)
+
 encoder = H264Encoder(1000000)
+output = FfmpegOutput("-f mpegts udp://127.0.0.1:10001?pkt_size=188&buffer_size=65535")
+cam.start_recording(encoder, output)
 
-with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-    sock.connect(("127.0.0.1", 10001))
-    stream = sock.makefile("wb")
-    picam2.start_recording(encoder, FileOutput(stream))
-    time.sleep(20)
-    picam2.stop_recording()
+atexit.register(exit_handler)
