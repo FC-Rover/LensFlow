@@ -19,3 +19,6 @@ stage/
 
 # Idea configuration
 .idea/
+
+# Temporary files
+*.*~
