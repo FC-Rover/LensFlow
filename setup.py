@@ -39,7 +39,7 @@ def determine_version():
 name = "lens-flow"
 description = "An applet to stream pi camera over http."
 author_email = "online@wolog.org"
-python_version = "3.10"
+python_version = "3.10.*"
 url = "https://github.com/snapcore/snapcraft"
 license_ = "GPL v3"
 classifiers = [
