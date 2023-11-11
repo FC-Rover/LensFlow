@@ -10,11 +10,21 @@ def exit_handler():
 
 
 cam = Picamera2()
-video_config = cam.create_video_configuration({"size": (1280, 720)})
-cam.configure(video_config)
 
-encoder = H264Encoder(1000000)
-output = FfmpegOutput("-f mpegts udp://127.0.0.1:10001?pkt_size=188&buffer_size=65535")
-cam.start_recording(encoder, output)
+
+def main():
+    try:
+        video_config = cam.create_video_configuration({"size": (1280, 720)})
+        cam.configure(video_config)
+
+        encoder = H264Encoder(1000000)
+        output = FfmpegOutput("-f mpegts udp://0.0.0.0:10001?pkt_size=188&buffer_size=65535")
+        cam.start_recording(encoder, output)
+    finally:
+        exit_handler()
+
 
 atexit.register(exit_handler)
+
+if __name__ == "__main__":
+    main()

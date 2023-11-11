@@ -1,4 +1,4 @@
-name: ramin-image-stream
+name: lens-flow
 summary: An applet to stream pi camera over http.
 description: |
   An applet to stream pi camera over http.
@@ -10,8 +10,8 @@ architectures:
 
 
 apps:
-  ramin-image-stream:
-    command: bin/flask-wrapper
+  lens-flow:
+    command: bin/lens-flow
     daemon: simple
     restart-condition: on-failure
     plugs:
@@ -21,46 +21,20 @@ apps:
       - media-control
       - hardware-observe
       - opengl
-    environment:
-      FLASK_APP: ./server.py
-      LC_ALL: C.UTF-8
-      LANG: C.UTF-8
 
 
 parts:
-  python-packages:
+  lens-flow:
     plugin: python
     source: .
-    python-requirements:
-      - requirements.txt
     build-packages:
       - libcap-dev
-    after:
-      - libcamera
-      - pykms
-    stage-packages:
-      - libgl1
-      - libice6
-      - libsm6
-      - libx11-6
-      - libxext6
-      - libxcb1
-      - libatlas-base-dev
-      - ffmpeg
-      - libopenjp2-7
-
-  flask-server:
-    plugin: dump
-    source: .
-    organize:
-      server.py: bin/
-      flask-wrapper: bin/
 
   libcamera:
     plugin: meson
     source: https://github.com/dehghanramin/libcamera.git
     meson-parameters:
-      - --prefix=/snap/ramin-image-stream/current/usr
+      - --prefix=/snap/lens-flow/current/usr
       - --buildtype=release
       - -Dpipelines=rpi/vc4,rpi/pisp
       - -Dipas=rpi/vc4,rpi/pisp
@@ -73,8 +47,8 @@ parts:
       - -Ddocumentation=disabled
       - -Dpycamera=enabled
     organize:
-      snap/ramin-image-stream/current/usr: usr
-      snap/ramin-image-stream/current/lib: lib
+      snap/lens-flow/current/usr: usr
+      snap/lens-flow/current/lib: lib
     build-packages:
       - build-essential
       - meson
@@ -134,10 +108,10 @@ parts:
     plugin: meson
     source: https://github.com/dehghanramin/kmsxx.git
     meson-parameters:
-      - --prefix=/snap/ramin-image-stream/current/usr
+      - --prefix=/snap/lens-flow/current/usr
     organize:
-      snap/ramin-image-stream/current/usr: usr
-      snap/ramin-image-stream/current/lib: lib
+      snap/lens-flow/current/usr: usr
+      snap/lens-flow/current/lib: lib
     build-packages:
       - libdrm-dev
       - libdrm2
