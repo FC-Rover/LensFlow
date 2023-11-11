@@ -12,7 +12,7 @@ def determine_version():
     # 0ae7c04
     desc = (
         subprocess.run(
-            ["git", "describe", "--always", "--long"],
+            ["git", "describe", "--tags", "--long"],
             stdout=subprocess.PIPE,
             check=False,
             text=True,
