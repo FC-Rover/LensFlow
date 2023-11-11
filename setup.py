@@ -1,4 +1,3 @@
-import os
 from setuptools import setup, find_namespace_packages
 import subprocess
 
@@ -24,7 +23,7 @@ def determine_version():
     split_desc = desc.split("-")
     assert (
             len(split_desc) == 3
-    ), f"Failed to parse lens-flow git version description {desc!r}. Confirm that git repository is present and has the required tags/history."
+    ), f"Failed to parse lens-flow git version description {desc!r}."
 
     version = split_desc[0]
     distance = split_desc[1]
@@ -40,6 +39,7 @@ def determine_version():
 name = "lens-flow"
 description = "An applet to stream pi camera over http."
 author_email = "online@wolog.org"
+python_version = "3.10"
 url = "https://github.com/snapcore/snapcraft"
 license_ = "GPL v3"
 classifiers = [
@@ -59,6 +59,7 @@ install_requires = [
 
 setup(
     name=name,
+    python_requires=f"={python_version}",
     version=determine_version(),
     description=description,
     author_email=author_email,

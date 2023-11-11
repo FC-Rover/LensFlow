@@ -1,10 +1,11 @@
 name: lens-flow
 summary: An applet to stream pi camera over http.
-description: |
-  An applet to stream pi camera over http.
-version: git
+description: An applet to stream pi camera over http.
 base: core22
+adopt-info: lens-flow
 confinement: strict
+license: GPL-3.0
+grade: devel
 architectures:
   - arm64
 
@@ -29,6 +30,9 @@ parts:
     source: .
     build-packages:
       - libcap-dev
+    override-build: |
+      version="$(python3 setup.py --version)"
+      snapcraftctl build
 
   libcamera:
     plugin: meson
