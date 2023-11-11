@@ -55,6 +55,7 @@ classifiers = [
 
 install_requires = [
     "picamera2",
+    "server",
 ]
 
 setup(
