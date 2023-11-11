@@ -35,8 +35,9 @@ parts:
       - pip
       - wheel
     override-build: |
-      snapcraftctl build
+      craftctl build
       version="$(python3 setup.py --version)"
+      ${SNAP}/libexec/snapcraft/craftctl set version="$version"
 
   libcamera:
     plugin: meson
