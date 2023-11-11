@@ -59,7 +59,7 @@ install_requires = [
 
 setup(
     name=name,
-    python_requires=f"={python_version}",
+    python_requires=f"=={python_version}",
     version=determine_version(),
     description=description,
     author_email=author_email,

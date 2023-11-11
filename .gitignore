@@ -13,3 +13,6 @@ stage/
 # Source archive packed by `snapcraft cleanbuild` before pushing to the LXD container
 /*_source.tar.bz2
 
+# Build log files
+*_arm64.txt
+*_arm64.[0-9]*.txt

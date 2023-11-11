@@ -30,9 +30,13 @@ parts:
     source: .
     build-packages:
       - libcap-dev
+    python-packages:
+      - setuptools
+      - pip
+      - wheel
     override-build: |
-      version="$(python3 setup.py --version)"
       snapcraftctl build
+      version="$(python3 setup.py --version)"
 
   libcamera:
     plugin: meson
