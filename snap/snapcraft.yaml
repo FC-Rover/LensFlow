@@ -28,6 +28,9 @@ parts:
   lens-flow:
     plugin: python
     source: .
+    after:
+      - libcamera
+      - pykms
     build-packages:
       - libcap-dev
     python-packages:
@@ -41,7 +44,7 @@ parts:
 
   libcamera:
     plugin: meson
-    source: https://github.com/dehghanramin/libcamera.git
+    source: https://github.com/raspberrypi/libcamera.git
     meson-parameters:
       - --prefix=/snap/lens-flow/current/usr
       - --buildtype=release
@@ -115,7 +118,7 @@ parts:
 
   pykms:
     plugin: meson
-    source: https://github.com/dehghanramin/kmsxx.git
+    source: https://github.com/tomba/kmsxx.git
     meson-parameters:
       - --prefix=/snap/lens-flow/current/usr
     organize:
