@@ -3,12 +3,11 @@ summary: An applet to stream pi camera over http.
 description: An applet to stream pi camera over http.
 base: core22
 adopt-info: lens-flow
-version: 1.0.0
 confinement: strict
 license: GPL-3.0
 grade: devel
 architectures:
-  - arm64
+  - build-on: [arm64]
 
 
 apps:
