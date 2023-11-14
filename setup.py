@@ -40,7 +40,7 @@ name = "lens-flow"
 description = "An applet to stream pi camera over http."
 author_email = "online@wolog.org"
 python_version = "3.10.*"
-url = "https://github.com/snapcore/snapcraft"
+url = "https://github.com/FC-Rover/LensFlow.git"
 license_ = "GPL v3"
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -55,7 +55,6 @@ classifiers = [
 
 install_requires = [
     "picamera2",
-    "server",
 ]
 
 setup(

@@ -15,7 +15,9 @@ stage/
 
 # Build log files
 *_arm64.txt
+*_amd64.txt
 *_arm64.[0-9]*.txt
+*_amd64.[0-9]*.txt
 
 # Idea configuration
 .idea/
