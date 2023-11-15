@@ -1,17 +1,18 @@
-name: ramin-image-stream
+name: lens-flow
 summary: An applet to stream pi camera over http.
-description: |
-  An applet to stream pi camera over http.
-version: git
+description: An applet to stream pi camera over http.
 base: core22
+adopt-info: lens-flow
 confinement: strict
+license: GPL-3.0
+grade: devel
 architectures:
-  - arm64
+  - build-on: [arm64]
 
 
 apps:
-  ramin-image-stream:
-    command: bin/flask-wrapper
+  lens-flow:
+    command: bin/lens-flow
     daemon: simple
     restart-condition: on-failure
     plugs:
@@ -22,45 +23,32 @@ apps:
       - hardware-observe
       - opengl
     environment:
-      FLASK_APP: ./server.py
-      LC_ALL: C.UTF-8
-      LANG: C.UTF-8
+      PYTHONPATH: /snap/lens-flow/current/usr/lib/x86_64-linux-gnu/python3.10/site-packages
 
 
 parts:
-  python-packages:
+  lens-flow:
     plugin: python
     source: .
-    python-requirements:
-      - requirements.txt
-    build-packages:
-      - libcap-dev
     after:
       - libcamera
       - pykms
-    stage-packages:
-      - libgl1
-      - libice6
-      - libsm6
-      - libx11-6
-      - libxext6
-      - libxcb1
-      - libatlas-base-dev
-      - ffmpeg
-      - libopenjp2-7
-
-  flask-server:
-    plugin: dump
-    source: .
-    organize:
-      server.py: bin/
-      flask-wrapper: bin/
+    build-packages:
+      - libcap-dev
+    python-packages:
+      - setuptools
+      - pip
+      - wheel
+    override-build: |
+      craftctl default
+      version="$(python3 setup.py --version)"
+      craftctl set version="$version"
 
   libcamera:
     plugin: meson
-    source: https://github.com/dehghanramin/libcamera.git
+    source: https://github.com/raspberrypi/libcamera.git
     meson-parameters:
-      - --prefix=/snap/ramin-image-stream/current/usr
+      - --prefix=/snap/lens-flow/current/usr
       - --buildtype=release
       - -Dpipelines=rpi/vc4,rpi/pisp
       - -Dipas=rpi/vc4,rpi/pisp
@@ -73,8 +61,8 @@ parts:
       - -Ddocumentation=disabled
       - -Dpycamera=enabled
     organize:
-      snap/ramin-image-stream/current/usr: usr
-      snap/ramin-image-stream/current/lib: lib
+      snap/lens-flow/current/usr: usr
+      snap/lens-flow/current/lib: lib
     build-packages:
       - build-essential
       - meson
@@ -132,12 +120,12 @@ parts:
 
   pykms:
     plugin: meson
-    source: https://github.com/dehghanramin/kmsxx.git
+    source: https://github.com/tomba/kmsxx.git
     meson-parameters:
-      - --prefix=/snap/ramin-image-stream/current/usr
+      - --prefix=/snap/lens-flow/current/usr
     organize:
-      snap/ramin-image-stream/current/usr: usr
-      snap/ramin-image-stream/current/lib: lib
+      snap/lens-flow/current/usr: usr
+      snap/lens-flow/current/lib: lib
     build-packages:
       - libdrm-dev
       - libdrm2

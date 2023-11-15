@@ -1,2 +1,2 @@
 # LensFlow
-AI module of the Valkyrie rover
+Camera module of the Valkyrie rover, using ffmpeg.

@@ -1,79 +1,30 @@
-#!/usr/bin/env python
-from flask import Flask, jsonify, Response
-from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
-from time import sleep
+import atexit
 from picamera2 import Picamera2
-from io import BytesIO
-
-# Define a counter metric
-counter_metric = Counter('ramin_image_stream_calls_total', 'Total calls to ramin image stream (counter)')
-
-__info = {
-    'name': 'Ramin Dehghan',
-    'email': 'online@wolog.org',
-    'title': 'dev',
-    'description': 'An applet to stream pi camera over http.'
-}
-
-info = __info
+from picamera2.encoders import H264Encoder
+from picamera2.outputs import FfmpegOutput
 
 
-application = Flask(__name__)
-
-# Init camera
-camera = Picamera2()
-config = camera.create_still_configuration()
-camera.configure(config)
-image = BytesIO()
+def exit_handler():
+    cam.stop_recording()
+    cam.close()
 
 
-@application.route('/')
-def index():
-    counter_metric.inc()
-    return "Functional"
-
-
-# Show info
-@application.route('/api/info', methods=['GET'])
-def get_info():
-    # Increase counter
-    counter_metric.inc()
-    return jsonify(info)
-
-
-# Provide dummy metrics for prometheus
-@application.route('/metrics')
-def metrics():
-    # Generate the latest metrics in Prometheus format
-    prometheus_metrics = generate_latest()
-    return Response(prometheus_metrics, mimetype=CONTENT_TYPE_LATEST)
-
-
-# Stream video
-def generate_frames():
-    try:
-        camera.start()
-        sleep(1)
-        while True:
-            camera.capture_file(image, format='jpeg')
-            image.seek(0)
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + image.read() + b'\r\n')
-    finally:
-        camera.stop()
-        camera.stop_preview()
-        camera.close()
-
-
-@application.route('/video')
-def video_feed():
-    counter_metric.inc()
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+cam = Picamera2()
 
 
 def main():
-    application.run()
+    try:
+        video_config = cam.create_video_configuration({"size": (1280, 720)})
+        cam.configure(video_config)
+
+        encoder = H264Encoder(1000000)
+        output = FfmpegOutput("-f mpegts udp://0.0.0.0:10001?pkt_size=188&buffer_size=65535")
+        cam.start_recording(encoder, output)
+    finally:
+        exit_handler()
 
 
-if __name__ == '__main__':
+atexit.register(exit_handler)
+
+if __name__ == "__main__":
     main()
