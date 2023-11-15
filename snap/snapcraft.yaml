@@ -35,6 +35,8 @@ parts:
       - pykms
     build-packages:
       - libcap-dev
+    stage-packages:
+      - ffmpeg
     python-packages:
       - setuptools
       - pip
