@@ -1,4 +1,4 @@
-from setuptools import setup, find_namespace_packages
+from setuptools import setup
 import subprocess
 
 
@@ -64,12 +64,12 @@ setup(
     description=description,
     author_email=author_email,
     url=url,
-    packages=find_namespace_packages(),
+    packages=["src"],
     license=license_,
     classifiers=classifiers,
     entry_points=dict(
         console_scripts=[
-            "lens-flow = server:main",
+            "lens-flow=src.server:main",
         ]
     ),
     install_requires=install_requires,
