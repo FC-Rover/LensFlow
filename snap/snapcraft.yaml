@@ -23,7 +23,7 @@ apps:
       - hardware-observe
       - opengl
     environment:
-      PYTHONPATH: /snap/lens-flow/current/usr/lib/x86_64-linux-gnu/python3.10/site-packages
+      PYTHONPATH: $SNAP/usr/lib/aarch64-linux-gnu/python3.10/site-packages
 
 
 parts:
