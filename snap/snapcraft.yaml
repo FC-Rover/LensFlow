@@ -52,8 +52,8 @@ parts:
     meson-parameters:
       - --prefix=/snap/lens-flow/current/usr
       - --buildtype=release
-      - -Dpipelines=rpi/vc4,rpi/pisp
-      - -Dipas=rpi/vc4,rpi/pisp
+      - -Dpipelines=rpi/vc4
+      - -Dipas=rpi/vc4
       - -Dv4l2=true
       - -Dgstreamer=enabled
       - -Dtest=false
