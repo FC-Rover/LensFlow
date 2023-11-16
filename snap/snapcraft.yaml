@@ -38,7 +38,6 @@ parts:
       - libcap-dev
     stage-packages:
       - ffmpeg
-      - libpulse0
     python-packages:
       - setuptools
       - pip
