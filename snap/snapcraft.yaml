@@ -51,6 +51,8 @@ parts:
   libcamera:
     plugin: meson
     source: https://github.com/raspberrypi/libcamera.git
+    source-type: git
+    source-commit: d477ee97bc2a086b5f486e4a967a08fcf68c35c9
     meson-parameters:
       - --prefix=/snap/lens-flow/current/usr
       - --buildtype=release
@@ -121,9 +123,6 @@ parts:
       - libexif12
       - libtiff5
       - libboost-log1.74.0
-    override-pull: |
-      craftctl default
-      git checkout d477ee97bc2a086b5f486e4a967a08fcf68c35c9
 
   pykms:
     plugin: meson
