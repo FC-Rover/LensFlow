@@ -19,8 +19,6 @@ layout:
     bind: $SNAP/etc/nginx
   /usr/lib/nginx:
     bind: $SNAP/usr/lib/nginx
-  /run/nginx.pid:
-    bind-file: $SNAP_COMMON/run/nginx.pid
 
 
 apps:
@@ -38,7 +36,7 @@ apps:
       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/aarch64-linux-gnu/pulseaudio:$SNAP/usr/lib/aarch64-linux-gnu/blas:$SNAP/usr/lib/aarch64-linux-gnu/caca:$SNAP/usr/lib/aarch64-linux-gnu/lapack
 
   nginx:
-    command: usr/sbin/nginx
+    command: usr/sbin/nginx -g 'daemon off;'
     daemon: simple
     restart-condition: on-failure
     plugs:
@@ -160,13 +158,13 @@ parts:
   nginx:
     plugin: nil
     source: nginx-config/
-    stage-packages:
+    build-packages:
       - nginx
       - libnginx-mod-rtmp
-    override-stage: |
+    override-prime: |
       craftctl default
-      cp $CRAFT_STAGE/etc/nginx/sites-available/default $CRAFT_STAGE/etc/nginx/sites-available/rtmp
-      cat $CRAFT_PART_SRC/dash.conf >$CRAFT_STAGE/etc/nginx/sites-available/rtmp
-      ln -s $CRAFT_STAGE/etc/nginx/sites-available/rtmp $CRAFT_STAGE/etc/nginx/sites-enabled/rtmp
-      cat $CRAFT_PART_SRC/main.conf >>$CRAFT_STAGE/etc/nginx/nginx.conf
-      sed -i '0,/^$/s//load_module \/usr\/lib\/nginx\/modules\/ngx_rtmp_module.so;\n/' $CRAFT_STAGE/etc/nginx/nginx.conf
+      cp $CRAFT_PRIME/etc/nginx/sites-available/default $CRAFT_PRIME/etc/nginx/sites-available/rtmp
+      cat $CRAFT_PART_SRC/dash.conf >$CRAFT_PRIME/etc/nginx/sites-available/rtmp
+      ln -s $CRAFT_PRIME/etc/nginx/sites-available/rtmp $CRAFT_PRIME/etc/nginx/sites-enabled/rtmp
+      cat $CRAFT_PART_SRC/main.conf >>$CRAFT_PRIME/etc/nginx/nginx.conf
+      sed -i '0,/^$/s//load_module \/usr\/lib\/nginx\/modules\/ngx_rtmp_module.so;\n/' $CRAFT_PRIME/etc/nginx/nginx.conf
