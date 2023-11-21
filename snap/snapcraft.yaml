@@ -16,8 +16,6 @@ apps:
     daemon: simple
     restart-condition: on-failure
     plugs:
-      - network
-      - network-bind
       - camera
       - media-control
       - hardware-observe
@@ -25,6 +23,14 @@ apps:
     environment:
       PYTHONPATH: $SNAP/usr/lib/aarch64-linux-gnu/python3.10/site-packages
       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/aarch64-linux-gnu/pulseaudio:$SNAP/usr/lib/aarch64-linux-gnu/blas:$SNAP/usr/lib/aarch64-linux-gnu/caca:$SNAP/usr/lib/aarch64-linux-gnu/lapack
+
+  nginx:
+    command: usr/sbin/nginx
+    daemon: simple
+    restart-condition: on-failure
+    plugs:
+      - network
+      - network-bind
 
 
 parts:
@@ -137,3 +143,14 @@ parts:
       - libfmt-dev
     stage-packages:
       - libfmt8
+
+  nginx:
+    plugin: nil
+    source: nginx-config/
+    stage-packages:
+      - nginx
+      - libnginx-mod-rtmp
+    override-stage: |
+      craftctl default
+      cp $CRAFT_PART_SRC/dash.conf $CRAFT_STAGE/etc/nginx/sites-available/rtmp
+      cat $CRAFT_PART_SRC/main.conf >>$CRAFT_STAGE/etc/nginx/nginx.conf
