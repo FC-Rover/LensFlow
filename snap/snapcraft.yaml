@@ -15,6 +15,8 @@ layout:
     bind: $SNAP_COMMON/var/log/nginx
   /etc/nginx:
     bind: $SNAP/etc/nginx
+  /usr/lib/nginx:
+    bind: $SNAP/usr/lib/nginx
 
 
 apps:
@@ -162,3 +164,4 @@ parts:
       touch $CRAFT_STAGE/etc/nginx/sites-available/rtmp
       cat $CRAFT_PART_SRC/dash.conf >$CRAFT_STAGE/etc/nginx/sites-available/rtmp
       cat $CRAFT_PART_SRC/main.conf >>$CRAFT_STAGE/etc/nginx/nginx.conf
+      sed -i '0,/^$/s//load_module \/usr\/lib\/nginx\/modules\/ngx_rtmp_module.so;\n/' $CRAFT_STAGE/etc/nginx/nginx.conf
