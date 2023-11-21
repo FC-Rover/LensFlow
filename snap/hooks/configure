@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
 mkdir -p $SNAP_COMMON/var/www/html/camera/dash
+mkdir -p $SNAP_COMMON/var/log/nginx

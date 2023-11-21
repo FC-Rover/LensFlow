@@ -154,3 +154,7 @@ parts:
       craftctl default
       cp $CRAFT_PART_SRC/dash.conf $CRAFT_STAGE/etc/nginx/sites-available/rtmp
       cat $CRAFT_PART_SRC/main.conf >>$CRAFT_STAGE/etc/nginx/nginx.conf
+      sed 's|/var/log/nginx/access\.log|$SNAP_COMMON&|g' $CRAFT_STAGE/etc/nginx/nginx.conf >$CRAFT_STAGE/etc/nginx/nginx.conf.new
+      mv $CRAFT_STAGE/etc/nginx/nginx.conf.new $CRAFT_STAGE/etc/nginx/nginx.conf
+      sed 's|/var/log/nginx/error\.log|$SNAP_COMMON&|g' $CRAFT_STAGE/etc/nginx/nginx.conf >$CRAFT_STAGE/etc/nginx/nginx.conf.new
+      mv $CRAFT_STAGE/etc/nginx/nginx.conf.new $CRAFT_STAGE/etc/nginx/nginx.conf
