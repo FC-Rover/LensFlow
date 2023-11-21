@@ -13,10 +13,14 @@ architectures:
 layout:
   /var/log/nginx:
     bind: $SNAP_COMMON/var/log/nginx
+  /var/www:
+    bind: $SNAP_COMMON/var/www
   /etc/nginx:
     bind: $SNAP/etc/nginx
   /usr/lib/nginx:
     bind: $SNAP/usr/lib/nginx
+  /run/nginx.pid:
+    bind-file: $SNAP_COMMON/run/nginx.pid
 
 
 apps:
@@ -161,7 +165,8 @@ parts:
       - libnginx-mod-rtmp
     override-stage: |
       craftctl default
-      touch $CRAFT_STAGE/etc/nginx/sites-available/rtmp
+      cp $CRAFT_STAGE/etc/nginx/sites-available/default $CRAFT_STAGE/etc/nginx/sites-available/rtmp
       cat $CRAFT_PART_SRC/dash.conf >$CRAFT_STAGE/etc/nginx/sites-available/rtmp
+      ln -s $CRAFT_STAGE/etc/nginx/sites-available/rtmp $CRAFT_STAGE/etc/nginx/sites-enabled/rtmp
       cat $CRAFT_PART_SRC/main.conf >>$CRAFT_STAGE/etc/nginx/nginx.conf
       sed -i '0,/^$/s//load_module \/usr\/lib\/nginx\/modules\/ngx_rtmp_module.so;\n/' $CRAFT_STAGE/etc/nginx/nginx.conf

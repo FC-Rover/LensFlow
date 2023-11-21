@@ -22,8 +22,9 @@ def main():
         cam.configure(video_config)
 
         encoder = H264Encoder(1000000)
-        output = FfmpegOutput("-f dash -window_size 5 -use_template 1 -use_timeline 1 /var/snap/lens-flow/common/var/www/html/camera/dash/stream.mpd")
+        output = FfmpegOutput("-f flv rtmp://localhost/live/stream")
         cam.start_recording(encoder, output)
+        # /var/snap/lens-flow/common/var/www/html/camera/dash/stream.mpd
         while True:
             sleep(10)
     finally:
