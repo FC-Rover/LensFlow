@@ -12,13 +12,11 @@ architectures:
 
 layout:
   /var/log/nginx:
-    bind: $SNAP_COMMON/var/log/nginx
-  /var/www:
-    bind: $SNAP_COMMON/var/www
-  /etc/nginx:
-    bind: $SNAP/etc/nginx
-  /usr/lib/nginx:
-    bind: $SNAP/usr/lib/nginx
+    bind: $SNAP_DATA/var/log/nginx
+  /usr/nginx/modules:
+    bind: $SNAP_DATA/usr/nginx/modules
+  /usr/nginx/conf:
+    bind: $SNAP_DATA/usr/nginx/conf
 
 
 apps:
@@ -36,8 +34,8 @@ apps:
       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/aarch64-linux-gnu/pulseaudio:$SNAP/usr/lib/aarch64-linux-gnu/blas:$SNAP/usr/lib/aarch64-linux-gnu/caca:$SNAP/usr/lib/aarch64-linux-gnu/lapack
 
   nginx:
-    command: usr/sbin/nginx -g 'daemon off;'
-    daemon: simple
+    command: bin/nginx
+    daemon: forking
     restart-condition: on-failure
     plugs:
       - network
@@ -156,15 +154,35 @@ parts:
       - libfmt8
 
   nginx:
-    plugin: nil
-    source: nginx-config/
+    plugin: autotools
+    source: http://nginx.org/download/nginx-1.25.3.tar.gz
     build-packages:
-      - nginx
-      - libnginx-mod-rtmp
-    override-prime: |
+      - libpcre3-dev
+      - libssl-dev
+      - pkg-config
+    autotools-configure-parameters:
+      - --prefix=/usr/nginx
+      - --sbin-path=/bin/nginx
+      - --modules-path=/usr/nginx/modules
+      - --conf-path=/usr/nginx/conf/nginx.conf
+      - --error-log-path=/var/log/nginx/error.log
+      - --http-log-path=/var/log/nginx/access.log
+      - --pid-path=/var/log/nginx/nginx.pid
+      - --lock-path=/var/log/nginx/nginx.lock
+      - --with-http_ssl_module
+      - --add-module=extras/nginx-rtmp-module
+    override-build: |
+      cp -r $CRAFT_PROJECT_DIR/extras $CRAFT_PART_BUILD/extras
       craftctl default
-      cp $CRAFT_PRIME/etc/nginx/sites-available/default $CRAFT_PRIME/etc/nginx/sites-available/rtmp
-      cat $CRAFT_PART_SRC/dash.conf >$CRAFT_PRIME/etc/nginx/sites-available/rtmp
-      ln -s $CRAFT_PRIME/etc/nginx/sites-available/rtmp $CRAFT_PRIME/etc/nginx/sites-enabled/rtmp
-      cat $CRAFT_PART_SRC/main.conf >>$CRAFT_PRIME/etc/nginx/nginx.conf
-      sed -i '0,/^$/s//load_module \/usr\/lib\/nginx\/modules\/ngx_rtmp_module.so;\n/' $CRAFT_PRIME/etc/nginx/nginx.conf
+      cat $CRAFT_PART_BUILD/extras/nginx-config/main.conf >>$CRAFT_PART_BUILD/usr/nginx/conf/nginx.conf
+      mkdir $CRAFT_PART_BUILD/etc/nginx/sites-available
+      mkdir $CRAFT_PART_BUILD/etc/nginx/sites-enabled
+      cp $CRAFT_PART_BUILD/extras/nginx-config/dash.conf $CRAFT_PART_BUILD/etc/nginx/sites-available/rtmp
+      ln -s $CRAFT_PART_BUILD/etc/nginx/sites-available/rtmp $CRAFT_PART_BUILD/etc/nginx/sites-enabled/rtmp
+    # override-prime: |
+    #   craftctl default
+    #   cp $CRAFT_PRIME/etc/nginx/sites-available/default $CRAFT_PRIME/etc/nginx/sites-available/rtmp
+    #   cat $CRAFT_PART_SRC/dash.conf >$CRAFT_PRIME/etc/nginx/sites-available/rtmp
+    #   ln -s $CRAFT_PRIME/etc/nginx/sites-available/rtmp $CRAFT_PRIME/etc/nginx/sites-enabled/rtmp
+    #   cat $CRAFT_PART_SRC/main.conf >>$CRAFT_PRIME/etc/nginx/nginx.conf
+    #   sed -i '0,/^$/s//load_module \/usr\/lib\/nginx\/modules\/ngx_rtmp_module.so;\n/' $CRAFT_PRIME/etc/nginx/nginx.conf
