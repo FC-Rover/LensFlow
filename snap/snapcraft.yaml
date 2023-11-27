@@ -7,8 +7,7 @@ confinement: strict
 license: GPL-3.0
 grade: devel
 architectures:
-  - build-on: [arm64, amd64]
-    build-for: [arm64]
+  - build-on: [arm64]
 
 
 layout:
