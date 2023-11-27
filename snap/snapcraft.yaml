@@ -7,12 +7,15 @@ confinement: strict
 license: GPL-3.0
 grade: devel
 architectures:
-  - build-on: [arm64]
+  - build-on: [arm64, amd64]
+    build-for: [arm64]
 
 
 layout:
   /var/log/nginx:
     bind: $SNAP_DATA/var/log/nginx
+  /var/www/html/stream:
+    bind: $SNAP_COMMON/var/www/html/stream
   /usr/nginx/modules:
     bind: $SNAP_DATA/usr/nginx/modules
   /usr/nginx/conf:
@@ -174,11 +177,16 @@ parts:
     override-build: |
       cp -r $CRAFT_PROJECT_DIR/extras $CRAFT_PART_BUILD/extras
       craftctl default
-      cat $CRAFT_PART_BUILD/extras/nginx-config/main.conf >>$CRAFT_PART_BUILD/usr/nginx/conf/nginx.conf
-      mkdir $CRAFT_PART_BUILD/etc/nginx/sites-available
-      mkdir $CRAFT_PART_BUILD/etc/nginx/sites-enabled
-      cp $CRAFT_PART_BUILD/extras/nginx-config/dash.conf $CRAFT_PART_BUILD/etc/nginx/sites-available/rtmp
-      ln -s $CRAFT_PART_BUILD/etc/nginx/sites-available/rtmp $CRAFT_PART_BUILD/etc/nginx/sites-enabled/rtmp
+      cat $CRAFT_PART_BUILD/extras/nginx-config/main.conf >>$CRAFT_PART_INSTALL/usr/nginx/conf/nginx.conf
+      mkdir -p $CRAFT_PART_INSTALL/etc/nginx/sites-available
+      mkdir -p $CRAFT_PART_INSTALL/etc/nginx/sites-enabled
+      cp $CRAFT_PART_BUILD/extras/nginx-config/default.conf $CRAFT_PART_INSTALL/etc/nginx/sites-available/default
+      cp $CRAFT_PART_BUILD/extras/nginx-config/dash.conf $CRAFT_PART_INSTALL/etc/nginx/sites-available/rtmp
+      export "MAIN_WORK_DIR=$PWD"
+      cd $CRAFT_PART_INSTALL/etc/nginx/sites-enabled
+      ln -s ../sites-available/rtmp rtmp
+      cd $MAIN_WORK_DIR
+      sed -i '/^$/ {s/^/include \/etc\/nginx\/sites-enabled\/*;/; :a; n; ba}' $CRAFT_PART_INSTALL/usr/nginx/conf/nginx.conf
     # override-prime: |
     #   craftctl default
     #   cp $CRAFT_PRIME/etc/nginx/sites-available/default $CRAFT_PRIME/etc/nginx/sites-available/rtmp
