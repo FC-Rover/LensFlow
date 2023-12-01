@@ -158,19 +158,23 @@ parts:
   nginx:
     plugin: autotools
     source: http://nginx.org/download/nginx-1.25.3.tar.gz
+    organize:
+      snap/lens-flow/current/usr: usr
+      snap/lens-flow/current/bin: bin
+      snap/lens-flow/current/var: var
     build-packages:
       - libpcre3-dev
       - libssl-dev
       - pkg-config
     autotools-configure-parameters:
-      - --prefix=/usr/nginx
-      - --sbin-path=/bin/nginx
-      - --modules-path=/usr/nginx/modules
-      - --conf-path=/usr/nginx/conf/nginx.conf
-      - --error-log-path=/var/log/nginx/error.log
-      - --http-log-path=/var/log/nginx/access.log
-      - --pid-path=/var/log/nginx/nginx.pid
-      - --lock-path=/var/log/nginx/nginx.lock
+      - --prefix=/snap/lens-flow/current/usr/nginx
+      - --sbin-path=/snap/lens-flow/current/bin/nginx
+      - --modules-path=/snap/lens-flow/current/usr/nginx/modules
+      - --conf-path=/snap/lens-flow/current/usr/nginx/conf/nginx.conf
+      - --error-log-path=/snap/lens-flow/current/var/log/nginx/error.log
+      - --http-log-path=/snap/lens-flow/current/var/log/nginx/access.log
+      - --pid-path=/snap/lens-flow/current/var/log/nginx/nginx.pid
+      - --lock-path=/snap/lens-flow/current/var/log/nginx/nginx.lock
       - --with-http_ssl_module
       - --add-module=extras/nginx-rtmp-module
     override-build: |
