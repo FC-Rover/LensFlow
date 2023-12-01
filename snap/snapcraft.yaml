@@ -11,14 +11,30 @@ architectures:
 
 
 layout:
-  /var/log/nginx:
-    bind: $SNAP_DATA/var/log/nginx
+  /usr/share:
+    bind: $SNAP/usr/share
+  /usr/html:
+    bind: $SNAP/usr/html
+  /etc/nginx:
+    bind: $SNAP/etc/nginx
+  /usr/modules:
+    bind: $SNAP/usr/modules
+  /usr/conf:
+    bind: $SNAP/usr/conf
+  /usr/logs:
+    bind: $SNAP_DATA/usr/logs
   /var/www/html/stream:
-    bind: $SNAP_COMMON/var/www/html/stream
-  /usr/nginx/modules:
-    bind: $SNAP_DATA/usr/nginx/modules
-  /usr/nginx/conf:
-    bind: $SNAP_DATA/usr/nginx/conf
+    type: tmpfs
+  /usr/client_body_temp:
+    bind-file: $SNAP/usr/client_body_temp
+  /usr/proxy_temp:
+    bind-file: $SNAP/usr/proxy_temp
+  /usr/fastcgi_temp:
+    bind-file: $SNAP/usr/fastcgi_temp
+  /usr/uwsgi_temp:
+    bind-file: $SNAP/usr/uwsgi_temp
+  /usr/scgi_temp:
+    bind-file: $SNAP/usr/scgi_temp
 
 
 apps:
@@ -36,7 +52,7 @@ apps:
       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/aarch64-linux-gnu/pulseaudio:$SNAP/usr/lib/aarch64-linux-gnu/blas:$SNAP/usr/lib/aarch64-linux-gnu/caca:$SNAP/usr/lib/aarch64-linux-gnu/lapack
 
   nginx:
-    command: bin/nginx
+    command: usr/sbin/nginx
     daemon: forking
     restart-condition: on-failure
     plugs:
@@ -68,7 +84,6 @@ parts:
     plugin: meson
     source: https://github.com/raspberrypi/libcamera.git
     source-type: git
-    source-commit: d477ee97bc2a086b5f486e4a967a08fcf68c35c9
     meson-parameters:
       - --prefix=/snap/lens-flow/current/usr
       - --buildtype=release
@@ -158,42 +173,23 @@ parts:
   nginx:
     plugin: autotools
     source: http://nginx.org/download/nginx-1.25.3.tar.gz
-    organize:
-      snap/lens-flow/current/usr: usr
-      snap/lens-flow/current/bin: bin
-      snap/lens-flow/current/var: var
     build-packages:
       - libpcre3-dev
       - libssl-dev
       - pkg-config
     autotools-configure-parameters:
-      - --prefix=/snap/lens-flow/current/usr/nginx
-      - --sbin-path=/snap/lens-flow/current/bin/nginx
-      - --modules-path=/snap/lens-flow/current/usr/nginx/modules
-      - --conf-path=/snap/lens-flow/current/usr/nginx/conf/nginx.conf
-      - --error-log-path=/snap/lens-flow/current/var/log/nginx/error.log
-      - --http-log-path=/snap/lens-flow/current/var/log/nginx/access.log
-      - --pid-path=/snap/lens-flow/current/var/log/nginx/nginx.pid
-      - --lock-path=/snap/lens-flow/current/var/log/nginx/nginx.lock
+      - --prefix=/usr
       - --with-http_ssl_module
       - --add-module=extras/nginx-rtmp-module
     override-build: |
       cp -r $CRAFT_PROJECT_DIR/extras $CRAFT_PART_BUILD/extras
       craftctl default
-      cat $CRAFT_PART_BUILD/extras/nginx-config/main.conf >>$CRAFT_PART_INSTALL/usr/nginx/conf/nginx.conf
       mkdir -p $CRAFT_PART_INSTALL/etc/nginx/sites-available
       mkdir -p $CRAFT_PART_INSTALL/etc/nginx/sites-enabled
       cp $CRAFT_PART_BUILD/extras/nginx-config/default.conf $CRAFT_PART_INSTALL/etc/nginx/sites-available/default
       cp $CRAFT_PART_BUILD/extras/nginx-config/dash.conf $CRAFT_PART_INSTALL/etc/nginx/sites-available/rtmp
+      mv $CRAFT_PART_BUILD/extras/nginx-config/nginx.conf $CRAFT_PART_INSTALL/usr/conf/nginx.conf
       export "MAIN_WORK_DIR=$PWD"
       cd $CRAFT_PART_INSTALL/etc/nginx/sites-enabled
       ln -s ../sites-available/rtmp rtmp
       cd $MAIN_WORK_DIR
-      sed -i '/^$/ {s/^/include \/etc\/nginx\/sites-enabled\/*;/; :a; n; ba}' $CRAFT_PART_INSTALL/usr/nginx/conf/nginx.conf
-    # override-prime: |
-    #   craftctl default
-    #   cp $CRAFT_PRIME/etc/nginx/sites-available/default $CRAFT_PRIME/etc/nginx/sites-available/rtmp
-    #   cat $CRAFT_PART_SRC/dash.conf >$CRAFT_PRIME/etc/nginx/sites-available/rtmp
-    #   ln -s $CRAFT_PRIME/etc/nginx/sites-available/rtmp $CRAFT_PRIME/etc/nginx/sites-enabled/rtmp
-    #   cat $CRAFT_PART_SRC/main.conf >>$CRAFT_PRIME/etc/nginx/nginx.conf
-    #   sed -i '0,/^$/s//load_module \/usr\/lib\/nginx\/modules\/ngx_rtmp_module.so;\n/' $CRAFT_PRIME/etc/nginx/nginx.conf
