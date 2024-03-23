@@ -19,6 +19,7 @@ def exit_handler():
 atexit.register(exit_handler)
 cam = Picamera2()
 
+
 ## Create server side sockets
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 hostname = socket.gethostname
